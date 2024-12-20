@@ -61,18 +61,23 @@ class main_app():
         print("[U]: Unfinished")
         print("[C]: Completed")
         print("The number to the the left of each task it its ID")
+        self.print_all_tasks_no_header()
+        return
+    
+    def print_all_tasks_no_header(self):
         print("--------------------------------------------------")
 
         if len(self.unfinished) + len(self.completed) == 0:
             print("You have not added any tasks!")
-        else:
-            for unfinished_task_ID in self.unfinished:
-                print("[U]", unfinished_task_ID, '-', self.id_task[unfinished_task_ID])
-            
-            for completed_task_ID in self.completed:
-                print("[C]", completed_task_ID, '-', self.id_task[completed_task_ID])
+            print("--------------------------------------------------")
+            return
         
+        for unfinished_task_ID in self.unfinished:
+            print("[U]", unfinished_task_ID, '-', self.id_task[unfinished_task_ID])
+        for completed_task_ID in self.completed:
+            print("[C]", completed_task_ID, '-', self.id_task[completed_task_ID])
         print("--------------------------------------------------")
+        return
     
     def view_tasks(self):
         task_view_mapper = {"c": (lambda: self.print_tasks(self.completed)), 
@@ -94,7 +99,40 @@ class main_app():
         return
 
     def update_task(self):
-        
+        self.print_all_tasks_no_header()
+
+        print("Which task would you like to update? ")
+        inp = input("Enter task ID (x to cancel): ")
+        while inp not in self.id_task and inp.lower() != 'x':
+            inp = input("Invalid input, please enter a valid ID: ")
+        if inp.lower() == 'x':
+            return
+        print(("[U] " if inp in self.unfinished else "[C] ")+ inp, '-', self.id_task[inp])
+
+        if inp in self.unfinished:
+            confirm = input("Set task {} ({}) to completed (Y/N)? ".format(inp, self.id_task[inp]))
+            while confirm.upper() not in ('Y', 'N'):
+                confirm = input("Invalid response, Y/N: ")
+            if confirm.upper() == 'N':
+                print("--------------------------------------------------")
+                return
+            self.completed.append(inp)
+            self.completed = list(map(str, sorted(map(int, self.completed))))
+            self.unfinished.remove(inp)
+        elif inp in self.completed:
+            confirm = input("Set task {} ({}) to unfinished (Y/N)? ".format(inp, self.id_task[inp]))
+            while confirm.upper() not in ('Y', 'N'):
+                confirm = input("Invalid response, Y/N: ")
+            if confirm.upper() == 'N':
+                return
+            self.unfinished.append(inp)
+            self.unfinished = list(map(str, sorted(map(int, self.unfinished))))
+            self.completed.remove(inp)
+
+        print("--------------------------------------------------")
+        self.update_save_file()
+        print("Task updated!")
+        print("--------------------------------------------------")
         return
 
     def add_task(self):
@@ -113,19 +151,9 @@ class main_app():
         return
 
     def edit_task(self):
-        print("--------------------------------------------------")
-        if len(self.unfinished) + len(self.completed) == 0:
-            print("You have not added any tasks!")
-            print("--------------------------------------------------")
-            return
-        
-        for unfinished_task_ID in self.unfinished:
-            print("[U]", unfinished_task_ID, '-', self.id_task[unfinished_task_ID])
-        
-        for completed_task_ID in self.completed:
-            print("[C]", completed_task_ID, '-', self.id_task[completed_task_ID])
-        print("--------------------------------------------------")
-        print("Which task would you like to update? ")
+        self.print_all_tasks_no_header()
+
+        print("Which task would you like to edit? ")
 
         inp = input("Enter task ID (x to cancel): ")
         while inp not in self.id_task and inp.lower() != 'x':
@@ -141,15 +169,41 @@ class main_app():
         self.id_task[inp] = new_task
         
         print("--------------------------------------------------")
-
         self.update_save_file()
-        print("Updated tasks!")
+        print("Task edited!")
         print("--------------------------------------------------")
         return
 
     def delete_task(self):
-        print("B")
-        pass
+        self.print_all_tasks_no_header()
+
+        print("Which task would you like to delete? ")
+        inp = input("Enter task ID (x to cancel): ")
+        while inp not in self.id_task and inp.lower() != 'x':
+            inp = input("Invalid input, please enter a valid ID: ")
+        if inp.lower() == 'x':
+            return
+        print(("[U] " if inp in self.unfinished else "[C] ")+ inp, '-', self.id_task[inp])
+
+        confirm = input("Delete task {} ({}) (Y/N)? ".format(inp, self.id_task[inp]))
+        while confirm.upper() not in ('Y', 'N'):
+            confirm = input("Invalid response, Y/N: ")
+        if confirm.upper() == 'N':
+            print("--------------------------------------------------")
+            return
+        
+        del self.id_task[inp]
+
+        if inp in self.unfinished:
+            self.unfinished.remove(inp)
+        elif inp in self.completed:
+            self.completed.remove(inp)
+
+        print("--------------------------------------------------")
+        self.update_save_file()
+        print("Task deleted!")
+        print("--------------------------------------------------")
+        return
 
     def get_action(self):
         actions = {"v": self.view_tasks, "u": self.update_task, "a": self.add_task, 
@@ -173,3 +227,5 @@ app = main_app()
 end_program = False
 while end_program == False:
     end_program = app.get_action()
+print("Program terminated. ")
+input("Press enter to close...")
