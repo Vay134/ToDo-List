@@ -66,11 +66,13 @@ class main_app():
         print("All tasks: a")
         print("Unfinished tasks: u")
         print("Completed tasks: c")
-        print("Back: b")
+        print("Back: x")
+        print("--------------------------------------------------")
         inp = input("Which tasks would you like to view? ")
-        while inp.lower() not in task_view_mapper:
-            inp = input("Invalid input, please enter a/u/c/b: ")
-        if inp.lower() == 'b':
+        while inp.lower() not in task_view_mapper and inp.lower() != 'x':
+            inp = input("Invalid input, please enter a/u/c/x: ")
+        if inp.lower() == 'x':
+            print("--------------------------------------------------")
             return
         task_view_mapper[inp]()
         return
@@ -96,10 +98,10 @@ class main_app():
         print("Exit: x")
         print("--------------------------------------------------")
         inp = input("What would you like to do? ")
+        while inp.lower() not in actions and inp.lower() != 'x':
+            inp = input("Invalid input, please enter v/u/e/d: ")
         if inp.lower() == 'x':
             return True
-        while inp.lower() not in actions:
-            inp = input("Invalid input, please enter v/u/e/d: ")
         actions[inp]()
         return False
 
