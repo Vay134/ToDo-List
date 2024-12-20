@@ -21,8 +21,8 @@ class main_app():
         with open ("save_data.txt", "r") as f:
             lines = f.readlines()
             self.max_id = lines.pop(0)
-            self.completed = {id.strip() for id in (lines.pop(0).split(":")[1]).split(",")}
-            self.unfinished = {id.strip() for id in (lines.pop(0).split(":")[1]).split(",")}
+            self.completed = [id.strip() for id in (lines.pop(0).split(":")[1]).split(",") if id.strip().isdigit()]
+            self.unfinished = [id.strip() for id in (lines.pop(0).split(":")[1]).split(",") if id.strip().isdigit()]
             self.id_task = dict([map(str.strip,line.split(":", 1)) for line in lines 
                                  if line.split(":",1)[0].strip().isdigit()])
         return
@@ -37,8 +37,11 @@ class main_app():
         print("The number to the the left of each task it its ID")
         print("--------------------------------------------------")
 
-        for task_ID in task_type:
-            print(task_ID, self.id_task[task_ID])
+        if len(task_type) == 0:
+            print("You currently have no {} tasks!".format("unfinished" if task_type is self.unfinished else "completed"))
+        else:
+            for task_ID in task_type:
+                print(task_ID, self.id_task[task_ID])
         
         print("--------------------------------------------------")
     
@@ -50,11 +53,14 @@ class main_app():
         print("The number to the the left of each task it its ID")
         print("--------------------------------------------------")
 
-        for unfinished_task_ID in self.unfinished:
-            print("[U]", unfinished_task_ID, self.id_task[unfinished_task_ID])
-        
-        for completed_task_ID in self.completed:
-            print("[C]", completed_task_ID, self.id_task[completed_task_ID])
+        if len(self.unfinished) + len(self.completed) == 0:
+            print("You have not added any tasks!")
+        else:
+            for unfinished_task_ID in self.unfinished:
+                print("[U]", unfinished_task_ID, self.id_task[unfinished_task_ID])
+            
+            for completed_task_ID in self.completed:
+                print("[C]", completed_task_ID, self.id_task[completed_task_ID])
         
         print("--------------------------------------------------")
     
